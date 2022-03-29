@@ -2,10 +2,10 @@
 using namespace std;
 
 
-void encryptFile(const wchar_t* filename, const wchar_t* filename2, bool isDecrypt) {
+void encryptFile(const wchar_t* filename, const wchar_t* filename2, const wchar_t* key, bool isDecrypt) {
 
-    wchar_t default_key[] = L"3igcZhRdWq96m3GUmTAiv9";
-    wchar_t* key_str = default_key;
+    //wchar_t default_key[] = L"3igcZhRdWq96m3GUmTAiv9";
+    const wchar_t* key_str = key;
 
     if (isDecrypt) {
         std::cout << "Decrypt mode\n";
