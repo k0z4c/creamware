@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{abedbd80-5d44-4374-84e2-6ef3300b2a44}</ProjectGuid>
-    <RootNamespace>ransomware</RootNamespace>
+    <RootNamespace>creamware</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
