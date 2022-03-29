@@ -7,6 +7,8 @@ Encryption is offered by the ["Microsoft Enhanced RSA and AES Cryptographic Prov
 
 *__@Let's c.r.e.a.m.__* together!
 
+Broght to you by the 0R1ngOCr3w
+
 ## Usage
 ```bash
 creamware c:\dir\to\fuck [aeskey16]
