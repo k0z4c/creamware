@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="encryptor.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="romeCrypt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="encryptor.h" />
