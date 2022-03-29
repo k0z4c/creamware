@@ -7,13 +7,9 @@
 
 using namespace std;
 
-void CloseHandleLog(HANDLE h, const std::string& name) {
-    ::CloseHandle(h);
-    std::cerr << " [LOG] Handler <" << name << "> closed OK." << std::endl;
-}
-
 void FindFile(const std::wstring& directory, wstring ext, queue<wstring>& results)
 {
+    // only local files - \\*
     std::wstring tmp = directory + L"\\*";
     WIN32_FIND_DATAW file;
     HANDLE search_handle = FindFirstFileW(tmp.c_str(), &file);
@@ -44,11 +40,9 @@ void FindFile(const std::wstring& directory, wstring ext, queue<wstring>& result
 
         for (std::vector<std::wstring>::iterator iter = directories.begin(), end = directories.end(); iter != end; ++iter)
             FindFile(*iter, ext, results);
-
-        //std::wcout << tmp << std::endl;
     }
 }
-//params: <input file> <output file> <is decrypt mode> <key>
+
 int wmain(int argc, wchar_t* argv[])
 {
 
