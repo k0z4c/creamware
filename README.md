@@ -7,7 +7,7 @@ Encryption is offered by the ["Microsoft Enhanced RSA and AES Cryptographic Prov
 
 *__@Let's c.r.e.a.m.__* together!
 
-Broght to you by the 0R1ngOCr3w
+Brought to you by the 0R1ngOCr3w
 
 ## Usage
 ```bash
