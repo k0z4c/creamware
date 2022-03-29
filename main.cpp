@@ -3,10 +3,13 @@
 #include <sstream>
 #include <iomanip>
 #include <queue>
+#include <Shlwapi.h>
 #include <tchar.h>
 
 #include <Windows.h>
 #include <wincrypt.h>
+
+#pragma comment(lib, "Shlwapi.lib")
 
 #pragma comment(lib, "advapi32.lib")
 
@@ -247,7 +250,7 @@ void encryptFile(const wchar_t* filename, const wchar_t* filename2, bool isDecry
     }
 }*/
 
-void FindFile(const std::wstring& directory, queue<wstring> &results)
+void FindFile(const std::wstring& directory, wstring ext, queue<wstring> &results)
 {
     std::wstring tmp = directory + L"\\*";
     WIN32_FIND_DATAW file;
@@ -265,8 +268,10 @@ void FindFile(const std::wstring& directory, queue<wstring> &results)
             }
 
             tmp = directory + L"\\" + std::wstring(file.cFileName);
-            results.push(tmp);
-            std::wcout << tmp << std::endl;
+            if (PathMatchSpecW(file.cFileName, ext.c_str())) {
+                results.push(tmp);
+            }
+            //std::wcout << tmp << std::endl;
 
             if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 directories.push_back(tmp);
@@ -275,7 +280,7 @@ void FindFile(const std::wstring& directory, queue<wstring> &results)
         FindClose(search_handle);
 
         for (std::vector<std::wstring>::iterator iter = directories.begin(), end = directories.end(); iter != end; ++iter)
-            FindFile(*iter, results);
+            FindFile(*iter, ext, results);
     }
 }
 //params: <input file> <output file> <is decrypt mode> <key>
@@ -312,7 +317,8 @@ int wmain(int argc, wchar_t* argv[])
 
     wstring directoryPath2 = L"c:\\users\\vagrant\\Desktop\\";
     queue<wstring> results;
-    FindFile(directoryPath2, results);
+    // TODO: list of extensions
+    FindFile(directoryPath2, L"*.ps1", results);
 
     cout << "queue ready" << endl;
     cout << "number of el " << results.size() << endl;
