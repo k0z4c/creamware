@@ -48,6 +48,13 @@ BOOL FindFile(const std::wstring &directory, wstring ext, queue<wstring> &result
     }
 }
 
+const wstring sanitizePath(wstring path) {
+     if('\\' == path[path.size() - 1]) {
+         path.pop_back();
+     }
+     return path;
+}
+
 int wmain(int argc, wchar_t** argv)
 {
     auto printNice = [](const wchar_t* s) {
@@ -66,8 +73,9 @@ int wmain(int argc, wchar_t** argv)
         return 0;
     }
 
-    const wchar_t* directoryPath = argv[1];
-    
+    wcout << argv[1] << endl;
+    const wstring directoryPath = sanitizePath(argv[1]);
+    wcout << "now " << directoryPath << endl;
     wcout << "dir path: " << directoryPath << endl;
     queue<wstring> results;
 
