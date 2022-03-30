@@ -28,7 +28,7 @@ void encryptFile(const wchar_t* filename, const wchar_t* filename2, const wchar_
 
     if (hInpFile == INVALID_HANDLE_VALUE) {
         cout << "Cannot open input file!\n";
-        system("pause");
+        //system("pause");
         return;
     }
     HANDLE hOutFile = CreateFileW(

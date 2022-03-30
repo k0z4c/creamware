@@ -100,6 +100,8 @@ int wmain(int argc, wchar_t** argv)
             aeskey, false
         );
 
+        DeleteFileW(fileName.c_str());
+
         wcout << fileName << endl;
         results.pop();
     }
