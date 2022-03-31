@@ -10,9 +10,23 @@ Encryption is offered by the ["Microsoft Enhanced RSA and AES Cryptographic Prov
 Brought to you by the 0R1ngOCr3w
 
 ## Usage
+
+#### To Encrypt
 ```bash
-creamware c:\dir\to\fuck [aeskey16]
+creamware c:\dir\to\c.r.e.a.m. [aeskey16]
+```
+After encryption a README.txt file is generated on the user's dektop.
+
+#### To Decrypt
+```bash
+creamware c:\dir\to\c.r.e.a.m. <aeskey> decrypt
+```
+
+If the default key was used, then issue the following
+```bash
+creamware.exe c:\dir\to\clean 3igcZhRdWq96m3GUmTAiv9 decrypt
 ```
 
 ### Notes:
-Compiled with Windows Visual Studio 2022, C++11
+Compiled with Windows Visual Studio 2022, C++11  
+The README.txt note on Desktop will not be deleted after recovery
