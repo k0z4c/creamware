@@ -27,6 +27,7 @@ void writeNote() {
 
     os << "You got C.R.E.A.M.E.D by k0z4c mf" << endl;
     os.close();
+    free(value);
 }
 
 BOOL FindFile(const std::wstring &directory, wstring ext, const wchar_t* aeskey, DWORD& errCode, modeFlag_t op)
