@@ -1,52 +1,58 @@
 #include<filesystem>
 #include<iostream>
-#include<vector>
+#include<list>
+#include<queue>
 #include<string>
-
-auto printErr = [](const char* msg)
-  { cout << "[x] " << msg << endl; }
 
 namespace fs = std::filesystem;
 using namespace std;
 
-typedef Node N;
+auto printErr = [](const char* msg)
+  { cout << "[x] " << msg << endl; };
 
 class Node {
-  fs::path value;
-  bool is_visited;
-  vector<fs::path> links;
-
+  list<fs::path> links;
+  
   public:
+    fs::path value;
+    bool is_visited;
     Node(fs::path p){
       value = p;
       is_visited = false;
-      links = // populate this stuff...maybe on heap ? need to sleep... cya 
     }
 
     fs::path getLink(){
-      return links.pop_first();
+      return links.front();
     }
-}
+    
+    void loadLinks(){
+      if(is_directory(value))
+        for (const auto & link : fs::directory_iterator(value))
+          links.push_back(link);
+      }
+};
 
-int main(int argc, char[] argv){
+typedef Node FsObj;
+
+int main(int argc, char** argv){
 
   const char* entryPoint = getenv("HOMEPATH");
-
   fs::path(entrypoint);
-  if(!entrypoint){
-    printErr("HOMEPATH not found...");
-  }
+  //if(!entrypoint){
+    //printErr("HOMEPATH not found...");
+  //}
 
-  fs::path(curr);
-  vector<fs::path> q; q.push_back(entrypoint);
-  for (const auto & entry : fs::directory_iterator(path)){
-    curr = q.pop_first();
+
+  FsObj curr = FsObj(entrypoint);
+  queue<FsObj> q; q.push(entrypoint);
+  
+  while(!q.empty())
+    // ecxtract node from the queeu the first
     if(curr.is_visited) continue;
-
     curr.is_visited = true;
-    if(curr.is_directory())
-      for (const auto & currEntry : fs::directory_iterator(curr))
-        q.push_back(currEntry); 
+    for(auto & link : in curr.links)
+       q.push(link);
+    q.pop(); //delete element from the queue ! 
 
   }
 
