@@ -1,53 +1,64 @@
 #include<filesystem>
 #include<iostream>
-#include<vector>
+#include<list>
+#include<queue>
 #include<string>
-
-auto printErr = [](const char* msg)
-  { cout << "[x] " << msg << endl; }
 
 namespace fs = std::filesystem;
 using namespace std;
 
-typedef Node N;
+auto printErr = [](const char* msg)
+  { cout << "[x] " << msg << endl; };
 
 class Node {
-  fs::path value;
-  bool is_visited;
-  vector<fs::path> links;
-
+  list<fs::path>::iterator curr;
+  
   public:
+    list<fs::path> links;
+    fs::path value;
+    bool is_visited;
+    
     Node(fs::path p){
       value = p;
+      curr = links.begin();
       is_visited = false;
-      links = // populate this stuff...maybe on heap ? need to sleep... cya 
     }
-
+    
     fs::path getLink(){
-      return links.pop_first();
+      if(curr != links.end())
+        return *curr;
     }
-}
+    
+    void loadLinks(){
+      if(is_directory(value))
+        for (const auto & link : fs::directory_iterator(value))
+          links.push_back(link);
+    }
+};
 
-int main(int argc, char[] argv){
+typedef Node FsObj;
 
-  const char* entryPoint = getenv("HOMEPATH");
+int main(int argc, char** argv){
 
-  fs::path(entrypoint);
-  if(!entrypoint){
-    printErr("HOMEPATH not found...");
-  }
-
-  fs::path(curr);
-  vector<fs::path> q; q.push_back(entrypoint);
-  for (const auto & entry : fs::directory_iterator(path)){
-    curr = q.pop_first();
+  fs::path entryPoint = getenv("HOME");
+  cout << entryPoint << endl;
+  FsObj curr = FsObj(entryPoint);
+  
+  cout << "created a filesystem object" << endl;
+  
+  queue<FsObj> q; q.push(curr);
+  
+  cout << "Pushed !" << endl ; 
+  while(!q.empty()){
+    cout << "the size of the queue " << q.size() << endl;
+    curr = q.front();
+    cout << "extracted " << curr.value << endl;
     if(curr.is_visited) continue;
-
+    
     curr.is_visited = true;
-    if(curr.is_directory())
-      for (const auto & currEntry : fs::directory_iterator(curr))
-        q.push_back(currEntry); 
-
+    curr.loadLinks();
+    for(auto & link : curr.links)
+       q.push(link);
+    q.pop();
   }
-
 }
