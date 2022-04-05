@@ -11,6 +11,7 @@ auto printErr = [](const char* msg)
   { cout << "[x] " << msg << endl; };
 
 class Node {
+
   list<fs::path>::iterator curr;
   
   public:
