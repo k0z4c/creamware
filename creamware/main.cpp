@@ -2,6 +2,10 @@
 #include <shlwapi.h>
 #include <vector>
 #include <fstream>
+#include <vss.h>
+#include <vswriter.h>
+#include <vsbackup.h>
+
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "VssApi.lib")
@@ -114,6 +118,10 @@ int wmain(int argc, wchar_t* argv[])
 
     printNice(L"Looking for volumes...");
     wchar_t* volName = new wchar_t[MAX_PATH];
+    HRESULT resSnap;
+    BOOL isSnapshotted;
+    LONG plSnapshotCapability;
+
     auto hVol = FindFirstVolumeW(
         volName, MAX_PATH);
     if (!hVol) {
@@ -121,7 +129,17 @@ int wmain(int argc, wchar_t* argv[])
         return 1;
     }
     printNice(L"Looking for volumes...:\n");
+    CoInitialize(nullptr);
+    // https://docs.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-isvolumesnapshottedinternal
+    // smth wrong with dis
     while (hVol) {
+        resSnap = IsVolumeSnapshottedInternal(volName, &isSnapshotted, nullptr);
+        if (resSnap != S_OK) {
+            printNice(L"some error occurred");
+            cout << GetLastError() << endl;
+        }
+        wcout << (isSnapshotted == TRUE? "snapshotted":"not snapshotted") << endl;
+
         printNice(volName);
         if(!FindNextVolumeW(hVol, volName, MAX_PATH)){
             wcout << GetLastError() << endl;
