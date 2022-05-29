@@ -122,29 +122,72 @@ int wmain(int argc, wchar_t* argv[])
     BOOL isSnapshotted;
     LONG plSnapshotCapability;
 
-    auto hVol = FindFirstVolumeW(
-        volName, MAX_PATH);
+    auto hVol = FindFirstVolumeW(volName, MAX_PATH);
     if (!hVol) {
         wcout << GetLastError() << endl;
         return 1;
     }
-    printNice(L"Looking for volumes...:\n");
-    CoInitialize(nullptr);
+
+    //CoInitialize(nullptr);
     // https://docs.microsoft.com/en-us/windows/win32/api/vsbackup/nf-vsbackup-isvolumesnapshottedinternal
     // smth wrong with dis
+
+
+    IVssBackupComponents* ppBackup = nullptr;
+    HRESULT resOp = CreateVssBackupComponents(&ppBackup);
+    if (resOp != S_OK) {
+        wcout << L"Some error occurred" << " " << GetLastError() << endl;
+        wcout << L"Exiting" << endl;
+        exit(1);
+    }
+
+    // init COM
+    CoInitialize(NULL);
+    HRESULT err = ppBackup->InitializeForBackup();
+    if ( err != S_OK) {
+        wcout << L"some problems with the backup init component..." << endl;
+        wcout << err << endl;
+        exit(2);
+    }
+
+    HRESULT hres = ppBackup->SetContext(VSS_CTX_ALL);
+    if ( hres != S_OK) {
+        wcout << L"error " << GetLastError() << endl;
+        wcout << L"eror 2 " << hres << endl;
+        wcout << L"Error occurred during set context call" << endl;
+        wcout << L"Exiting..." << endl;
+        exit(1);
+    };
+    IVssEnumObject* snapshotIterator = nullptr;
+    HRESULT hResult = ppBackup->Query(GUID_NULL, VSS_OBJECT_NONE, VSS_OBJECT_SNAPSHOT, &snapshotIterator);
+    // TODO
+    // https://docs.microsoft.com/th-th/windows/win32/api/vss/nf-vss-ivssenumobject-next
+    // https://docs.microsoft.com/en-us/windows/win32/api/vss/nn-vss-ivssenumobject
+    cout << snapshotIterator -> Next() << endl;
+    // free
+    ppBackup->Release();
+
+    wcout << "enum " << snapshotIterator << endl;
+
     while (hVol) {
-        resSnap = IsVolumeSnapshottedInternal(volName, &isSnapshotted, nullptr);
-        if (resSnap != S_OK) {
-            printNice(L"some error occurred");
-            cout << GetLastError() << endl;
-        }
-        wcout << (isSnapshotted == TRUE? "snapshotted":"not snapshotted") << endl;
+
 
         printNice(volName);
-        if(!FindNextVolumeW(hVol, volName, MAX_PATH)){
+        if (!FindNextVolumeW(hVol, volName, MAX_PATH)) {
             wcout << GetLastError() << endl;
             break;
         }
+        //resSnap = IsVolumeSnapshottedInternal(volName, &isSnapshotted, nullptr);
+        //if (resSnap != S_OK) {
+            //printNice(L"some error occurred");
+            //cout << GetLastError() << endl;
+        //}
+        //wcout << (isSnapshotted == TRUE? "snapshotted":"not snapshotted") << endl;
+
+        //printNice(volName);
+        //if(!FindNextVolumeW(hVol, volName, MAX_PATH)){
+            //wcout << GetLastError() << endl;
+            //break;
     }
 
     FindVolumeClose(hVol);
