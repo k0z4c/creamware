@@ -1,7 +1,11 @@
 CXX = g++
-LD = ld
-CFLAGS = -Wall -I./lib/cryptopp860
+CFLAGS = -Wall -Wextra -O2 -I./lib/cryptopp860 -L./lib/cryptopp860 -lcryptopp
 TARGET = creamware
-creamware: egg.cpp
-	$(CXX) $(CFLAGS) egg.cpp -o $@
 
+creamware: egg.cpp
+	$(CXX) egg.cpp $(CFLAGS) -o $@ 
+
+%.o: %.c
+
+clean:
+	rm ./creamware 
