@@ -7,7 +7,8 @@ Encryption is offered by the ["Microsoft Enhanced RSA and AES Cryptographic Prov
 
 *__@Let's c.r.e.a.m.__* together!
 
-Brought to you by ~~the 0R1ngOCr3w~~ myself. 
+Brought to you by the 0R1ngOCr3w - joint venture by [@k0z4c](https://github.com/cyb0tage) and [@Cyb0tage](https://github.com/cyb0tage).
+
 
 ## Usage
 
@@ -30,3 +31,10 @@ creamware.exe c:\dir\to\clean 3igcZhRdWq96m3GUmTAiv9 decrypt
 ### Notes:
 Compiled with Windows Visual Studio 2022, C++11  
 The README.txt note on Desktop will not be deleted after recovery
+
+### Contributions 
+Many thanks to my fella [@Cyb0tage](https://github.com/cyb0tage) for the ideas, contributions and the testing part.  
+\
+We got the feva <3
+
+
